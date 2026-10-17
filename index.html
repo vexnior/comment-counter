@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080c14"><meta name="color-scheme" content="dark">
+<title>Comment Counter</title>
+<style>
+:root{--bg:#080c14;--s:#0d1220;--b:#1e2d45;--a:#00c8ff;--ok:#00e896;--d:#ff4d6d;--t:#e2eaf5;--m:#7a90b0}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;min-height:100dvh;
+ padding:max(16px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(48px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.w{width:100%;max-width:860px;margin:auto}
+h1{font-size:clamp(20px,5vw,28px);margin-bottom:4px}.sub{color:var(--m);font-size:clamp(12px,3.4vw,14px);margin-bottom:20px}
+.p{background:var(--s);border:1px solid var(--b);border-radius:14px;padding:clamp(14px,4vw,24px);margin-bottom:16px}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{flex:1 1 140px;background:none;border:1px solid var(--b);color:var(--m);padding:12px 14px;border-radius:10px;cursor:pointer;font-size:14px;min-height:44px;touch-action:manipulation}
+.tab.on{border-color:var(--a);color:var(--a)}
+input,textarea{width:100%;background:var(--bg);border:1px solid var(--b);color:var(--t);border-radius:10px;padding:12px;font:16px ui-monospace,Menlo,Consolas,monospace;margin-bottom:12px;-webkit-appearance:none;appearance:none;outline:none}
+input:focus,textarea:focus{border-color:var(--a)}
+textarea{resize:vertical;min-height:160px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button.go,button.g{flex:1 1 140px;min-height:46px;border-radius:10px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button.go{background:var(--a);color:#05111f;border:0}button.go:disabled{opacity:.5}
+button.g{background:none;border:1px solid var(--b);color:var(--m);margin:0}
+@media(hover:hover){button.go:hover:not(:disabled){filter:brightness(1.1)}button.g:hover{color:var(--t)}}
+.st{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.chip{flex:1 1 130px;background:var(--bg);border:1px solid var(--b);border-radius:10px;padding:10px 16px;font-size:12px;color:var(--m)}
+.chip b{display:block;font-size:clamp(20px,6vw,26px);color:var(--ok)}
+.box{max-height:min(460px,60vh);overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--b);border-radius:10px}
+table{width:100%;min-width:320px;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left;font-size:13px;border-top:1px solid var(--b);word-break:break-word}
+th{font-size:11px;text-transform:uppercase;color:var(--m);position:sticky;top:0;background:#131926;border:0;white-space:nowrap}
+td.u{color:var(--a);font-family:ui-monospace,Menlo,Consolas,monospace}
+.err{color:var(--d);font-size:13px;margin-top:10px}.hide{display:none}
+.out-btns{margin-top:12px}
+@media(max-width:480px){th:nth-child(3),td:nth-child(3){display:none}}
+
+.step{color:var(--a);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+ol{padding-left:20px;font-size:14px;line-height:1.9;color:#b8c8dd;margin-bottom:14px}
+a.bm{display:inline-block;background:#131926;border:1px dashed var(--a);color:var(--a);padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:600;margin-bottom:12px;cursor:grab}
+.note{font-size:12px;color:var(--m);line-height:1.7;margin-top:10px}
+</style></head><body><div class="w">
+<h1>💬 Comment Counter</h1><p class="sub">Free • kono API/token lage na • Tweet er sob commenter + count</p>
+
+<div class="p">
+ <div class="step">Step 1 — Collect (nijer browser e)</div>
+ <ol>
+  <li>X (Twitter) e login kore tweet ta khulun (reply gulo dekha jay emon page).</li>
+  <li>Niche er <b>script copy</b> korun, tarpor browser console e paste kore Enter din <i>(Desktop: F12 → Console)</i>.</li>
+  <li>Script nije scroll kore sob commenter collect korbe. Sesh hole list copy hoye jabe.</li>
+ </ol>
+ <div class="btns"><button class="go" onclick="copyScript()">📋 Copy Script</button></div>
+ <p style="margin:12px 0 6px;font-size:13px;color:var(--m)">Ba bookmark banan (ek click e kaj kore): niche er button ta bookmarks bar e drag korun 👇</p>
+ <a class="bm" id="bm" href="#">⚡ Collect Comments</a>
+ <p class="note">📱 <b>Mobile:</b> Android Chrome e console nei — bookmark kore, tweet khule address bar e bookmark er naam likhe select korun. iPhone Safari te bookmark kore Share → Bookmarks theke chalan. Na parle Step 2 te nijer hate comment copy kore paste korun, seta-o kaj kore.<br>⚠️ Script X er page structure er upor nirbhor; X page change korle kaj na korte pare.</p>
+</div>
+
+<div class="p">
+ <div class="step">Step 2 — Paste &amp; Count</div>
+ <textarea id="paste" placeholder="Script er copy kora list ekhane paste korun (ba X er comment section copy kore)"></textarea>
+ <div class="btns"><button class="go" onclick="run()">Count Comments →</button><button class="g" onclick="location.reload()">↺ Reset</button></div>
+ <div class="err" id="err"></div>
+</div>
+
+<div class="p hide" id="out">
+ <div class="st" id="stats"></div>
+ <div class="box"><table><thead><tr><th>#</th><th>Username</th><th>Comments</th></tr></thead><tbody id="rows"></tbody></table></div>
+ <div class="btns out-btns"><button class="go" onclick="copy()">Copy list</button><button class="g" onclick="csv()">Download CSV</button></div>
+</div>
+</div>
+<script>
+let data=[];const $=id=>document.getElementById(id);
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+async function collector(){
+  const seen=new Map(),mainId=(location.pathname.match(/status\/(\d+)/)||[])[1];
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:#000;color:#0f0;padding:12px;border-radius:10px;font:14px sans-serif;max-width:260px;border:1px solid #0f0';
+  document.body.appendChild(box);
+  let idle=0;
+  while(idle<8){
+    let added=0;
+    document.querySelectorAll('article[data-testid="tweet"]').forEach(a=>{
+      const t=a.querySelector('time'),l=t&&t.closest('a');
+      const id=l&&(l.getAttribute('href').match(/status\/(\d+)/)||[])[1];
+      if(!id||id===mainId||seen.has(id))return;
+      const h=[...a.querySelectorAll('[data-testid="User-Name"] a')].map(x=>x.getAttribute('href')).find(x=>/^\/\w+$/.test(x));
+      if(h){seen.set(id,h.slice(1));added++}
+    });
+    document.querySelectorAll('[role="button"]').forEach(b=>{if(/show (more|additional) replies|show probable spam/i.test(b.innerText))b.click()});
+    box.textContent='Collecting... '+seen.size+' comments';
+    idle=added?0:idle+1;
+    window.scrollBy(0,innerHeight*0.8);
+    await new Promise(r=>setTimeout(r,1200));
+  }
+  const out=[...seen.values()].map(u=>'@'+u).join('\n');
+  box.innerHTML='';
+  const m=document.createElement('div');m.textContent='✅ '+seen.size+' comments collected';box.appendChild(m);
+  const ta=document.createElement('textarea');ta.value=out;ta.style.cssText='width:100%;height:80px;margin:8px 0;font-size:12px';box.appendChild(ta);
+  const b=document.createElement('button');b.textContent='Copy';b.style.cssText='padding:8px 16px;font-size:14px';
+  b.onclick=()=>{ta.select();try{document.execCommand('copy');b.textContent='Copied ✓'}catch(e){}};box.appendChild(b);
+  try{await navigator.clipboard.writeText(out);b.textContent='Copied ✓'}catch(e){}
+}
+const SRC='('+collector.toString()+')()';
+$('bm').href='javascript:'+encodeURIComponent(SRC);
+$('bm').onclick=e=>{e.preventDefault();alert('Ei button ta bookmarks bar e drag korun, ekhane click korben na.')};
+function copyScript(){
+  const ok=()=>alert('Script copied! Ekhon X er tweet page e giye Console e paste kore Enter din.');
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(SRC).then(ok,()=>fb(SRC,ok));else fb(SRC,ok)}
+
+function run(){
+  $('err').textContent='';
+  const c={};
+  ($('paste').value.match(/@[A-Za-z0-9_]{1,15}/g)||[]).forEach(h=>{const k=h.slice(1).toLowerCase();c[k]=c[k]||{username:h.slice(1),count:0};c[k].count++});
+  data=Object.values(c).sort((a,b)=>b.count-a.count);
+  if(!data.length){$('err').textContent='❌ Kono @username paoa jayni';return}
+  const total=data.reduce((s,x)=>s+x.count,0);
+  $('stats').innerHTML=`<div class="chip"><b>${total}</b>Total comments</div><div class="chip"><b>${data.length}</b>Unique users</div>`;
+  $('rows').innerHTML=data.map((x,i)=>`<tr><td>${i+1}</td><td class="u">@${esc(x.username)}</td><td>${x.count}</td></tr>`).join('');
+  $('out').classList.remove('hide');$('out').scrollIntoView({behavior:'smooth'});
+}
+function copy(){const t=data.map((x,i)=>`${i+1}. @${x.username} (${x.count})`).join('\n');const ok=()=>alert('Copied!');
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(ok,()=>fb(t,ok));else fb(t,ok)}
+function fb(t,ok){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){alert('Copy hoyni, manually select korun')}a.remove()}
+function csv(){const s='username,count\n'+data.map(x=>`@${x.username},${x.count}`).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv'}));a.download='comments.csv';a.click()}
+</script></body></html>
